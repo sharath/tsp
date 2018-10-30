@@ -2,102 +2,60 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 import dill
-from constants import *
+from typing import List
 
-
-class Vertex:
-    def __init__(self, name : str, x : int = None, y: int = None) -> None:
-        self._name = name
-        if x is None or y is None:
-            x = np.random.randint(d)
-            y = np.random.randint(d)
-        self._x = x
-        self._y = y
-        
-        
-    @property
-    def name(self) -> str:
-        return self._name
-    
-    
-    @property
-    def x(self) -> int:
-        return self._x
-    
-    
-    @property
-    def y(self) -> int:
-        return self._y
-    
-    
-class WeightedEdge:
-    def __init__(self, a : Vertex, b: Vertex, w: float = 1) -> None:
-        assert isinstance(a, Vertex)
-        assert isinstance(b, Vertex)
-        self._a = a
-        self._b = b
-        self._w = w
-        
-        
-    @property
-    def a(self) -> Vertex:
-        return self._a
-    
-    
-    @property
-    def b(self) -> Vertex:
-        return self._b
-    
-    
-    @property
-    def w(self) -> float:
-        return self._w
-    
 
 class UndirectedWeightedGraph:
     def __init__(self) -> None:
-        self._G = {}
+        self.__G = {}
+        
+    def add_vertex(self, a : str) -> None:
+        assert a not in self.__G
+        self.__G[a] = []
+        
+    def add_edge(self, a : str, b : str, w : float = 1) -> None:
+        assert a in self.__G and b in self.__G
+        assert isinstance(a, str) and isinstance(b, str)
+        
+        edge1 = (b, w)
+        edge2 = (a, w)
+        
+        assert edge1 not in self.__G[a]
+        assert edge2 not in self.__G[b]
+        
+        self.__G[a].append(edge1)
+        self.__G[b].append(edge2)
+        
+    def get_neighbors(self, a : str) -> List:
+        assert a in self.__G
+        return self.__G[a]
     
-    
-    def add_vertex(self, vertex : Vertex) -> None:
-        assert isinstance(vertex, Vertex)
-        assert vertex not in self._G
-        
-        self._G[vertex] = []
-        
-        
-    def add_edge(self, a : Vertex, b : Vertex, w : float = 1) -> None:
-        assert isinstance(a, Vertex)
-        assert isinstance(b, Vertex)
-        
-        assert a in self._G
-        assert b in self._G
-        
-        assert b not in self._G[a]
-        assert a not in self._G[b]
-        
-        self._G[a].append(b)
-        self._G[b].append(a)
-        
-        
-    def neighbors(self, vertex : Vertex) -> list:
-        assert vertex in self._G
-        return list(self._G[vertex])
-    
-    
-    def vertex_with_name(self, name) -> Vertex:
-        for i in range(self._G):
-            if i.name == name:
-                return i
-        raise ValueError
-        
-        
     def save(self, filename : str) -> None:
+        assert isinstance(filename, str)
         with open(filename, 'wb') as fd:
             dill.dump(self, fd)
             
+    @property
+    def adjacency(self) -> List:
+        return self.__G
             
-def load_graph(filename : str) -> None:
+def load_graph(filename : str) -> UndirectedWeightedGraph:
+    assert isinstance(filename, str)
     with open(filename, 'rb') as fd:
         g = dill.load(fd)
+    return g
+
+def random_weight_connected_graph(k : int = 5, wlow : int = 1, whigh : int = 3) -> UndirectedWeightedGraph:
+    if k >= len(ascii_uppercase):
+        raise NotImplementedError
+        
+    g = UndirectedWeightedGraph()
+    
+    for i in range(k):
+        g.add_vertex(ascii_uppercase[i])
+        
+    for i in range(k):
+        for j in range(k):
+            if i < j:
+                g.add_edge(ascii_uppercase[i], ascii_uppercase[j], np.random.randint(wlow, whigh))
     return g
