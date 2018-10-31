@@ -1,4 +1,4 @@
-![Random Positions for Connected Graph on 10 vertices](k10.png)
+![Demonstration of the Complexity of the TSP](np-complete.gif)
 
 # tsp
 Project for Math 455: Discrete Structures
