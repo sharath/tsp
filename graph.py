@@ -39,7 +39,6 @@ class Vertex:
 class UndirectedWeightedGraph:
     def __init__(self) -> None:
         self.__G = {} # adjacency list of weights
-        self.__loc = {}
         self.__vertices = {} # actual vertex objects
         
     def add_vertex(self, a : str, x : int = None, y : int =None, color : Tuple = None) -> None:
@@ -73,8 +72,8 @@ class UndirectedWeightedGraph:
     def get_loc(self, name : str) -> Tuple:
         return self.__vertices[name].loc
     
-    def save_viz(self, filename : str, figsize : Tuple = (10, 10), dpi : int = 50, vradius : float = 2.3, edge_col : Tuple = (0, 0, 0)) -> None:
-        fig, ax = plt.subplots(figsize=(10, 10))
+    def show(self, filename : str = None, figsize : Tuple = (10, 10), dpi : int = 50, vradius : float = 2.3, edge_col : Tuple = (0, 0, 0)) -> plt.Figure:
+        fig, ax = plt.subplots(figsize=figsize)
         ax.axis('equal')
         ax.set_xlim((int(-0.25*d), int(1.25*d)))
         ax.set_ylim((int(-0.25*d), int(1.25*d)))
@@ -87,8 +86,10 @@ class UndirectedWeightedGraph:
             viz.set_edgecolor(edge_col)
             viz.set_facecolor(self.get_col(vname))
             ax.add_artist(viz)
-        fig.savefig(filename, dpi=dpi)
+        if filename:
+            fig.savefig(filename, dpi=dpi)
         plt.close()
+        return fig
 
     
     def save(self, filename : str) -> None:
