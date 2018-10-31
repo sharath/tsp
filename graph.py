@@ -6,6 +6,7 @@ import dill
 from matplotlib.patches import Circle, ConnectionPatch
 from string import ascii_uppercase
 from typing import List, Tuple
+from utils import euclidean_distance
 from constants import *
 
 class Vertex:
@@ -17,9 +18,9 @@ class Vertex:
         self._x, self._y =  x, y
         
         if not color:
-            color = (np.random.rand(),
-                     np.random.rand(),
-                     np.random.rand(), 1)
+            color = (np.random.uniform(0.1, 1),
+                     np.random.uniform(0.1, 1),
+                     np.random.uniform(0.1, 1), 0.8)
         self._color = color
         
     @property
@@ -46,9 +47,12 @@ class UndirectedWeightedGraph:
         self.__G[a] = []
         self.__vertices[a] = Vertex(a, x=x, y=y, color=color)
         
-    def add_edge(self, a : str, b : str, w : float = 1) -> None:
+    def add_edge(self, a : str, b : str, w : float = None) -> None:
         assert a in self.__G and b in self.__G
         assert isinstance(a, str) and isinstance(b, str)
+        
+        if not w:
+            w = euclidean_distance(self.get_loc(a), self.get_loc(b))
         
         edge1 = (b, w)
         edge2 = (a, w)
@@ -87,7 +91,6 @@ class UndirectedWeightedGraph:
         plt.close()
 
     
-    
     def save(self, filename : str) -> None:
         assert isinstance(filename, str)
         with open(filename, 'wb') as fd:
@@ -116,5 +119,5 @@ def random_connected_graph(k=5) -> UndirectedWeightedGraph:
     for i in range(k):
         for j in range(k):
             if i < j:
-                g.add_edge(ascii_uppercase[i], ascii_uppercase[j], np.random.randint(wlow, whigh))
+                g.add_edge(ascii_uppercase[i], ascii_uppercase[j])
     return g
