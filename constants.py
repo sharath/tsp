@@ -1,5 +1,7 @@
 import numpy as np
 
-np.random.seed(0)
-
+wlow = 1
+whigh = 4
 d = 100
+
+rseed = 420
