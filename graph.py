@@ -72,7 +72,7 @@ class UndirectedWeightedGraph:
     def get_loc(self, name : str) -> Tuple:
         return self.__vertices[name].loc
     
-    def show(self, filename : str = None, figsize : Tuple = (10, 10), dpi : int = 50, vradius : float = 2.3, edge_col : Tuple = (0, 0, 0)) -> plt.Figure:
+    def show(self, filename : str = None, figsize : Tuple = (10, 10), dpi : int = 50, vradius : float = 2.3, edge_col : Tuple = (0, 0, 0, 0.6)) -> plt.Figure:
         fig, ax = plt.subplots(figsize=figsize)
         ax.axis('equal')
         ax.set_xlim((int(-0.25*d), int(1.25*d)))
@@ -108,17 +108,17 @@ def load_graph(filename : str) -> UndirectedWeightedGraph:
     return g
 
 def random_connected_graph(k=5) -> UndirectedWeightedGraph:
-    if k >= len(ascii_uppercase):
-        raise NotImplementedError
+    #if k >= len(ascii_uppercase):
+    #    raise NotImplementedError
     
     np.random.seed(rseed)
     g = UndirectedWeightedGraph()
     
     for i in range(k):
-        g.add_vertex(ascii_uppercase[i])
+        g.add_vertex(f'{i}')
         
     for i in range(k):
         for j in range(k):
             if i < j:
-                g.add_edge(ascii_uppercase[i], ascii_uppercase[j])
+                g.add_edge(f'{i}', f'{j}')
     return g
