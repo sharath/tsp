@@ -1,22 +1,89 @@
 import numpy as np
-
-from graph import random_connected_graph
+import dill
+from scipy.special import factorial
+from graph import random_connected_graph, UndirectedWeightedGraph
+from typing import List
 from abc import ABC
 
 
-class Optimizer(ABC):
-    def __init__(self, problem, start):
-        self.__problem = problem
-        self.__state = start
-        
-    def check(self, state) -> int:
-        pass
-    
-    def step(self) -> None:
-        pass
-        
 
-class SimulatedAnnealing(Optimizer):
-    def __init__(self, problem, start):
-        self.super(problem, start)
+class ClosedPath:
+    def __init__(self, seq : List, problem : UndirectedWeightedGraph) -> None:
+        assert seq is not None
+        assert isinstance(seq, list)
+        assert seq[0] == seq[-1]
         
+        self.__seq = seq
+        self.__prob = problem
+        self.__cost = 0
+        for i in range(1, len(seq)):
+            a = seq[i-1]
+            b = seq[i]
+            self.__cost += problem.weight(a, b)
+        
+    @property
+    def sequence(self) -> List:
+        return self.__seq
+    
+    @property
+    def length(self) -> int:
+        return int(self.__cost)
+    
+    def __str__(self) -> str:
+        return ' -> '.join(self.__seq)
+
+    def __repr__(self) -> str:
+        return ' -> '.join(self.__seq)
+
+    
+class BruteForceOptimizer:
+    def __init__(self, problem):
+        self.__problem = problem
+        self.__solution = None
+        self.__history = {}
+        
+    def __record(self) -> None:
+        if '__solution' not in self.__history:
+            self.__history['__solution'] = []
+        self.__history['__solution'].append(self.__solution)
+        
+    @property
+    def recording(self) -> List:
+        return self.__history['__solution']
+        
+    def solve(self) -> ClosedPath:
+        self.__solution = None
+        self.__history = {}
+        
+        paths = {}
+        while len(paths) < factorial(len(self.__problem.vertices)):
+            path = rand_path(self.__problem)
+            paths[str(path)] = path
+    
+        self.__solution = None
+        val = np.inf
+        for p in paths:
+            if paths[p].length < val:
+                self.__solution = paths[p]
+                val = paths[p].length
+            self.__record()
+        return self.__solution
+
+            
+# performs dfs on all vertices and adds the final edge to the start vertex and returns a path object
+def rand_path(problem : UndirectedWeightedGraph) -> ClosedPath:
+    assert isinstance(problem, UndirectedWeightedGraph)
+    
+    start = np.random.choice(problem.vertices)
+    frontier = [start]
+    visited = []
+    
+    while len(frontier) > 0:
+        cur = frontier.pop()
+        visited.append(cur)
+        for n, d in np.random.permutation(problem.neighbors(cur)):
+            if n not in visited and n not in frontier:
+                frontier.append(n)
+                
+    visited.append(start)
+    return ClosedPath(visited, problem)

@@ -4,8 +4,7 @@ import matplotlib.pyplot as plt
 import dill
 
 from matplotlib.patches import Circle, ConnectionPatch
-from string import ascii_uppercase
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 from utils import euclidean_distance
 from constants import *
 
@@ -18,9 +17,9 @@ class Vertex:
         self._x, self._y =  x, y
         
         if not color:
-            color = (np.random.uniform(0.1, 1),
+            color = (np.random.uniform(0.5, 1),
                      np.random.uniform(0.1, 1),
-                     np.random.uniform(0.1, 1), 0.8)
+                     np.random.uniform(0.5, 1), 1)
         self._color = color
         
     @property
@@ -38,10 +37,10 @@ class Vertex:
     
 class UndirectedWeightedGraph:
     def __init__(self) -> None:
-        self.__G = {} # adjacency list of weights
+        self.__G = {}        # adjacency list of weights
         self.__vertices = {} # actual vertex objects
         
-    def add_vertex(self, a : str, x : int = None, y : int =None, color : Tuple = None) -> None:
+    def add_vertex(self, a : str, x : int = None, y : int = None, color : Tuple = None) -> None:
         assert a not in self.__G
         self.__G[a] = []
         self.__vertices[a] = Vertex(a, x=x, y=y, color=color)
@@ -62,32 +61,51 @@ class UndirectedWeightedGraph:
         self.__G[a].append(edge1)
         self.__G[b].append(edge2)
         
-    def get_neighbors(self, a : str) -> List:
+    @property
+    def vertices(self) -> np.array:
+        return np.array([i for i in self.__G])
+        
+    def neighbors(self, a : str) -> np.array:
         assert a in self.__G
         return self.__G[a]
         
+    def weight(self, a : str, b: str) -> np.array:
+        assert a in self.__G
+        for p in self.__G[a]:
+            if p[0] == b:
+                return p[1]
+        raise ValueError
+    
     def get_col(self, name : str) -> Tuple:
         return self.__vertices[name].color
     
     def get_loc(self, name : str) -> Tuple:
         return self.__vertices[name].loc
     
-    def show(self, filename : str = None, figsize : Tuple = (10, 10), dpi : int = 50, vradius : float = 2.3, edge_col : Tuple = (0, 0, 0, 0.6)) -> plt.Figure:
+    def show(self, filename : str = None,
+             figsize : Tuple = (10, 10),
+             dpi : int = 50,
+             vradius : float = 2.3,
+             edge_col : Tuple = (0, 0, 0, 0.6),
+             fsize=12, fcol='black', vshift : int = 0) -> plt.Figure:
         fig, ax = plt.subplots(figsize=figsize)
         ax.axis('equal')
-        ax.set_xlim((int(-0.25*d), int(1.25*d)))
-        ax.set_ylim((int(-0.25*d), int(1.25*d)))
+        ax.set_xlim((int(-0.05*d), int(1.05*d)))
+        ax.set_ylim((int(-0.05*d), int(1.05*d)))
         ax.set_xticks([]), ax.set_yticks([])
+        sns.despine(left=True, bottom=True, right=True)
         for v1 in self.adjacency:
             for v2 in self.adjacency:
                 ax.add_artist(ConnectionPatch(self.get_loc(v1), self.get_loc(v2), 'data'))
         for vname in self.adjacency:
+            textposx, textposy = self.get_loc(vname)
             viz = Circle(self.get_loc(vname), vradius)
             viz.set_edgecolor(edge_col)
             viz.set_facecolor(self.get_col(vname))
+            ax.annotate(vname, xy=self.get_loc(vname), fontsize=fsize, ha='center', xytext=(textposx, textposy+vshift), color=fcol)
             ax.add_artist(viz)
         if filename:
-            fig.savefig(filename, dpi=dpi)
+            fig.savefig(filename, dpi=dpi, bbox_inches="tight", pad_inches=0)
         plt.close()
         return fig
 
@@ -96,9 +114,9 @@ class UndirectedWeightedGraph:
         assert isinstance(filename, str)
         with open(filename, 'wb') as fd:
             dill.dump(self, fd)
-            
+    
     @property
-    def adjacency(self) -> List:
+    def adjacency(self) -> Dict:
         return self.__G
             
 def load_graph(filename : str) -> UndirectedWeightedGraph:
@@ -108,9 +126,6 @@ def load_graph(filename : str) -> UndirectedWeightedGraph:
     return g
 
 def random_connected_graph(k=5) -> UndirectedWeightedGraph:
-    #if k >= len(ascii_uppercase):
-    #    raise NotImplementedError
-    
     np.random.seed(rseed)
     g = UndirectedWeightedGraph()
     
