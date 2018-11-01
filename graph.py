@@ -95,7 +95,7 @@ class UndirectedWeightedGraph:
         ax.set_xticks([]), ax.set_yticks([])
         sns.despine(left=True, bottom=True, right=True)
         for v1 in self.adjacency:
-            for v2 in self.adjacency:
+            for v2, _ in self.neighbors(v1):
                 ax.add_artist(ConnectionPatch(self.get_loc(v1), self.get_loc(v2), 'data'))
         for vname in self.adjacency:
             textposx, textposy = self.get_loc(vname)
