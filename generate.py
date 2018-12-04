@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from multiprocessing import Pool
 import sys
@@ -97,9 +98,13 @@ def main():
     iterations, paths, bf, temps, prob  = iterations, paths, bf, temps, prob = simulated_annleaing(T=50, points=10, dim=1, T_bound=0.001, T_decay=0.99, max_iter=1000, T_schedule='exp')#, seed=234)
     
     p = Pool(20)
+    try:
+        os.mkdir('out')
+    except:
+        pass
     
     m = []
-    for i in iterations[-1:]:
+    for i in iterations:
         args = {}
         args['it'] = i
         args['paths'] = paths
