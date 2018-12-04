@@ -94,12 +94,12 @@ def rec(args):
 
 def main():
     plt.rcParams["figure.figsize"] = (10, 10)
-    iterations, paths, bf, temps, prob  = iterations, paths, bf, temps, prob = simulated_annleaing(T=50, points=10, dim=10, T_bound=0.002, T_decay=0.999, max_iter=10000, T_schedule='exp', seed=0)
+    iterations, paths, bf, temps, prob  = iterations, paths, bf, temps, prob = simulated_annleaing(T=50, points=10, dim=1, T_bound=0.001, T_decay=0.99, max_iter=1000, T_schedule='exp')#, seed=234)
     
     p = Pool(20)
     
     m = []
-    for i in iterations:
+    for i in iterations[-1:]:
         args = {}
         args['it'] = i
         args['paths'] = paths
