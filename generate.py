@@ -15,7 +15,7 @@ def dist(xp):
 
 def permute(xp):
     t = eval(str(xp))
-    i = int(np.random.randint(1, len(t[0])-3))
+    i = int(np.random.randint(0, len(t[0])-2))
     t[0][i], t[1][i], t[0][i+1], t[1][i+1] = t[0][i+1], t[1][i+1], t[0][i], t[1][i]
     return t
 
@@ -24,8 +24,8 @@ def simulated_annleaing(T=3, points=15, dim=20, T_bound=1e-4, T_decay=0.01, T_sc
     np.random.seed(seed)
     xc = (np.random.rand(2, points)*dim).tolist()
     
-    xc[0].append(xc[0][0])
-    xc[1].append(xc[1][0])
+    #xc[0].append(xc[0][0])
+    #xc[1].append(xc[1][0])
     
     paths = [xc]
     bf = [dist(xc)]
@@ -95,7 +95,7 @@ def rec(args):
 
 def main():
     plt.rcParams["figure.figsize"] = (10, 10)
-    iterations, paths, bf, temps, prob  = iterations, paths, bf, temps, prob = simulated_annleaing(T=50, points=10, dim=1, T_bound=0.001, T_decay=0.99, max_iter=1000, T_schedule='exp')#, seed=234)
+    iterations, paths, bf, temps, prob  = iterations, paths, bf, temps, prob = simulated_annleaing(T=5, points=10, dim=1, T_bound=0, T_decay=0.996, max_iter=5, T_schedule='exp')#, seed=234)
     
     p = Pool(20)
     try:
